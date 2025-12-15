@@ -2,7 +2,7 @@
 const params = new URLSearchParams(window.location.search);
 const city = params.get("city");
 
-const API = "https://travel-api-aravindh.workers.dev?city=" + encodeURIComponent(city);
+const API = "https://aitraveldiscovery.aravindhsilva.workers.dev?city=" + encodeURIComponent(city);
 // ⬆️ REPLACE travel-api-aravindh with YOUR actual worker name
 
 const list = document.getElementById("list");
@@ -46,3 +46,4 @@ function openMap(lat, lon) {
   );
 }
 </script>
+
