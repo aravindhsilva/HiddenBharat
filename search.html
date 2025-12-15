@@ -1,39 +1,45 @@
 <script>
-const city = new URLSearchParams(window.location.search).get("city");
-const API = "https://aitraveldiscovery.aravindhsilva.workers.dev?city=" + city;
+const params = new URLSearchParams(window.location.search);
+const city = params.get("city");
+
+const API = "https://travel-api-aravindh.workers.dev?city=" + encodeURIComponent(city);
+// ⬆️ REPLACE travel-api-aravindh with YOUR actual worker name
+
+const list = document.getElementById("list");
+list.innerHTML = "Loading places...";
 
 fetch(API)
-  .then(res => res.json())
+  .then(response => response.json())
   .then(data => {
-    const d = document.getElementById("list");
-    d.innerHTML = "";
+    list.innerHTML = "";
 
     if (data.error) {
-      d.innerHTML = "Error: " + data.error;
+      list.innerHTML = "API Error: " + data.error;
       return;
     }
 
     if (!data.features || data.features.length === 0) {
-      d.innerHTML = "No places found.";
+      list.innerHTML = "No places found.";
       return;
     }
 
-    data.features.forEach(p => {
-      d.innerHTML += `
+    data.features.forEach(place => {
+      list.innerHTML += `
         <div class="card">
-          <h3>${p.properties.name || "Unknown Place"}</h3>
-          <button onclick="map(${p.geometry.coordinates[1]}, ${p.geometry.coordinates[0]})">
+          <h3>${place.properties.name || "Unknown Place"}</h3>
+          <button onclick="openMap(${place.geometry.coordinates[1]}, ${place.geometry.coordinates[0]})">
             Directions
           </button>
-        </div>`;
+        </div>
+      `;
     });
   })
   .catch(err => {
-    document.getElementById("list").innerHTML =
-      "Failed to load data. Check API.";
+    list.innerHTML = "Failed to load data. Check Worker URL.";
+    console.error(err);
   });
 
-function map(lat, lon) {
+function openMap(lat, lon) {
   window.open(
     "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lon,
     "_blank"
