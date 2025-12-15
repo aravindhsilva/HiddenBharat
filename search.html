@@ -1,53 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Places to Visit</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:Arial;background:#eee;margin:0}
-h2{text-align:center;padding:10px}
-.card{background:#fff;margin:10px;padding:15px;border-radius:8px}
-button{padding:8px;background:#138808;color:white;border:none}
-</style>
-</head>
-<body>
-
-<h2>Recommended Places</h2>
-<div id="list">Loading...</div>
-
 <script>
-const city=new URLSearchParams(window.location.search).get("city");
-
-/* 🔴 UPDATE THIS AFTER WORKER IS CREATED */
-const API="https://aitraveldiscovery.aravindhsilva.workers.dev?city="+city;
+const city = new URLSearchParams(window.location.search).get("city");
+const API = "https://aitraveldiscovery.aravindhsilva.workers.dev?city=" + city;
 
 fetch(API)
-.then(r=>r.json())
-.then(data=>{
-  const d=document.getElementById("list");
-  d.innerHTML="";
+  .then(res => res.json())
+  .then(data => {
+    const d = document.getElementById("list");
+    d.innerHTML = "";
 
-  if(!data.features || data.features.length===0){
-    d.innerHTML="No places found.";
-    return;
-  }
+    if (data.error) {
+      d.innerHTML = "Error: " + data.error;
+      return;
+    }
 
-  data.features.forEach(p=>{
-    d.innerHTML+=`
-      <div class="card">
-        <h3>${p.properties.name || "Unknown Place"}</h3>
-        <button onclick="map(${p.geometry.coordinates[1]},${p.geometry.coordinates[0]})">
-          Directions
-        </button>
-      </div>`;
+    if (!data.features || data.features.length === 0) {
+      d.innerHTML = "No places found.";
+      return;
+    }
+
+    data.features.forEach(p => {
+      d.innerHTML += `
+        <div class="card">
+          <h3>${p.properties.name || "Unknown Place"}</h3>
+          <button onclick="map(${p.geometry.coordinates[1]}, ${p.geometry.coordinates[0]})">
+            Directions
+          </button>
+        </div>`;
+    });
+  })
+  .catch(err => {
+    document.getElementById("list").innerHTML =
+      "Failed to load data. Check API.";
   });
-});
 
-function map(lat,lon){
-  window.open("https://www.openstreetmap.org/?mlat="+lat+"&mlon="+lon,"_blank");
+function map(lat, lon) {
+  window.open(
+    "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lon,
+    "_blank"
+  );
 }
 </script>
-
-</body>
-</html>
